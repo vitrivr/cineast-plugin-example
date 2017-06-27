@@ -30,12 +30,12 @@ public class MinimalExampleExtractor implements Extractor {
    */
   @Override
   public void initalizePersistentLayer(Supplier<EntityCreator> supply) {
-    EntityCreator creator = supply.get();
-    // Here we create a default feature entity which consists of an id and a feature vector. Since
-    // this extractor produces at most one feature vector per segment, we set the unique flag to
-    // true. This method is called during the setup procedure.
-    creator.createFeatureEntity(ENTITY_NAME, true);
-    creator.close();
+    try(EntityCreator creator = supply.get()){
+      // Here we create a default feature entity which consists of an id and a feature vector. Since
+      // this extractor produces at most one feature vector per segment, we set the unique flag to
+      // true. This method is called during the setup procedure.
+      creator.createFeatureEntity(ENTITY_NAME, true);
+    }
   }
 
   /*
@@ -44,9 +44,9 @@ public class MinimalExampleExtractor implements Extractor {
    */
   @Override
   public void dropPersistentLayer(Supplier<EntityCreator> supply) {
-    EntityCreator creator = supply.get();
-    creator.dropEntity(ENTITY_NAME);
-    creator.close();
+    try(EntityCreator creator = supply.get()){
+      creator.dropEntity(ENTITY_NAME);
+    }
   }
 
   /*
@@ -73,7 +73,7 @@ public class MinimalExampleExtractor implements Extractor {
     }
 
     // We use the externally defined feature transformation to get to the vector representation.
-    FloatVector feature = ExampleFeatueTransform.dominantChannelHistogram(sc);
+    FloatVector feature = ExampleFeatureTransform.dominantChannelHistogram(sc);
 
     // In order to be able to write to the persistent storage layer, we first need to generate a
     // PersistentTuple which holds the properties expected by the entity in the storage layer. In

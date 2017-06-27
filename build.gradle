@@ -7,13 +7,6 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDir 'config'
-        }
-    }
-}
 
 configurations {
     provided

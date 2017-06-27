@@ -41,7 +41,7 @@ public class MinimalExampleFeatureModule extends AbstractFeatureModule {
     }
 
     // We use the externally defined feature transformation to get to the vector representation.
-    FloatVector feature = ExampleFeatueTransform.dominantChannelHistogram(sc);
+    FloatVector feature = ExampleFeatureTransform.dominantChannelHistogram(sc);
 
     // This is a helper method which persists the vector representation in the storage layer.
     persist(sc.getId(), feature);
@@ -56,7 +56,7 @@ public class MinimalExampleFeatureModule extends AbstractFeatureModule {
   public List<ScoreElement> getSimilar(SegmentContainer sc, ReadableQueryConfig qc) {
 
     // We use the exact same feature transform for the query as for the extraction.
-    FloatVector queryVector = ExampleFeatueTransform.dominantChannelHistogram(sc);
+    FloatVector queryVector = ExampleFeatureTransform.dominantChannelHistogram(sc);
     float[] queryFloatArray = ReadableFloatVector.toArray(queryVector);
 
     // Since this is a standard nearest-neighbour search, we can use the helper method to handle the

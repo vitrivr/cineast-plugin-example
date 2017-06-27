@@ -38,11 +38,11 @@ public class MinimalExampleRetriever implements Retriever {
    */
   @Override
   public void initalizePersistentLayer(Supplier<EntityCreator> supply) {
-    EntityCreator creator = supply.get();
-    // Here we create a default feature entity which consists of an id and a feature vector. This
-    // method is called during the setup procedure.
-    creator.createFeatureEntity(ENTITY_NAME, true);
-    creator.close();
+    try(EntityCreator creator = supply.get()){
+      // Here we create a default feature entity which consists of an id and a feature vector. This
+      // method is called during the setup procedure.
+      creator.createFeatureEntity(ENTITY_NAME, true);
+    }
   }
 
   /*
@@ -51,9 +51,9 @@ public class MinimalExampleRetriever implements Retriever {
    */
   @Override
   public void dropPersistentLayer(Supplier<EntityCreator> supply) {
-    EntityCreator creator = supply.get();
-    creator.dropEntity(ENTITY_NAME);
-    creator.close();
+    try(EntityCreator creator = supply.get()){
+      creator.dropEntity(ENTITY_NAME);
+    }
   }
 
   /*
@@ -68,12 +68,13 @@ public class MinimalExampleRetriever implements Retriever {
 
   /*
    * This method is used for content-based retrieval. It has to perform a transformation compatible
-   * to the one used during extraction.
+   * to the one used during extraction. The provided SegmentContainer contains the relevant query
+   * information
    */
   @Override
   public List<ScoreElement> getSimilar(SegmentContainer sc, ReadableQueryConfig qc) {
     // We use the exact same feature transform for the query as for the extraction.
-    FloatVector queryVector = ExampleFeatueTransform.dominantChannelHistogram(sc);
+    FloatVector queryVector = ExampleFeatureTransform.dominantChannelHistogram(sc);
     float[] queryFloatArray = ReadableFloatVector.toArray(queryVector);
 
     // We use the DBSelector to perform a nearest neighbour query on the storage layer.
@@ -82,7 +83,8 @@ public class MinimalExampleRetriever implements Retriever {
         Config.sharedConfig().getRetriever().getMaxResultsPerModule(),
         queryFloatArray, // We use the previously computed vector as a query-vector
         "feature", // By default, the property which holds the vectors is called 'feature'
-        // We can specify if we want to have results relevant to segments or to entire multimedia objects.
+        // Specify the type of results that we expect, that is either segments
+        // or entire multimedia objects.
         SegmentDistanceElement.class,
         // The QueryConfig holds additional settings to be used during the lookup. It specifies
         // for instance, which distance function is to be used.
@@ -135,7 +137,6 @@ public class MinimalExampleRetriever implements Retriever {
       this.selector.close();
       this.selector = null;
     }
-
   }
 
 }
