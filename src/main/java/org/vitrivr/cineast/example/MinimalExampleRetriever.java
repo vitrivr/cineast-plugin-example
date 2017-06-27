@@ -38,7 +38,7 @@ public class MinimalExampleRetriever implements Retriever {
    */
   @Override
   public void initalizePersistentLayer(Supplier<EntityCreator> supply) {
-    try(EntityCreator creator = supply.get()){
+    try (EntityCreator creator = supply.get()) {
       // Here we create a default feature entity which consists of an id and a feature vector. This
       // method is called during the setup procedure.
       creator.createFeatureEntity(ENTITY_NAME, true);
@@ -51,7 +51,7 @@ public class MinimalExampleRetriever implements Retriever {
    */
   @Override
   public void dropPersistentLayer(Supplier<EntityCreator> supply) {
-    try(EntityCreator creator = supply.get()){
+    try (EntityCreator creator = supply.get()) {
       creator.dropEntity(ENTITY_NAME);
     }
   }

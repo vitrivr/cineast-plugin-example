@@ -30,7 +30,7 @@ public class MinimalExampleExtractor implements Extractor {
    */
   @Override
   public void initalizePersistentLayer(Supplier<EntityCreator> supply) {
-    try(EntityCreator creator = supply.get()){
+    try (EntityCreator creator = supply.get()) {
       // Here we create a default feature entity which consists of an id and a feature vector. Since
       // this extractor produces at most one feature vector per segment, we set the unique flag to
       // true. This method is called during the setup procedure.
@@ -44,14 +44,14 @@ public class MinimalExampleExtractor implements Extractor {
    */
   @Override
   public void dropPersistentLayer(Supplier<EntityCreator> supply) {
-    try(EntityCreator creator = supply.get()){
+    try (EntityCreator creator = supply.get()) {
       creator.dropEntity(ENTITY_NAME);
     }
   }
 
   /*
-   * This method is used to initialise the extractor with a connection to the storage layer. It
-   * is called at the beginning of every new extraction.
+   * This method is used to initialise the extractor with a connection to the storage layer. It is
+   * called at the beginning of every new extraction.
    */
   @Override
   public void init(PersistencyWriterSupplier pwriterSupply) {
