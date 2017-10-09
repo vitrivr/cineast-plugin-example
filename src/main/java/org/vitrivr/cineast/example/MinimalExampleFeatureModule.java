@@ -33,7 +33,7 @@ public class MinimalExampleFeatureModule extends AbstractFeatureModule {
    * one vector per container but other mappings are possible as well.
    */
   @Override
-  public void processShot(SegmentContainer sc) {
+  public void processSegment(SegmentContainer sc) {
     // We first check if the segment is already present in the storage layer. If so, no further
     // extraction needs to be performed.
     if (phandler.idExists(sc.getId())) {
