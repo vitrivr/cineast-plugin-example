@@ -24,7 +24,7 @@ public class MinimalExampleFeatureModule extends AbstractFeatureModule {
   private static final float MAX_DISTANCE = 1f;
 
   public MinimalExampleFeatureModule() {
-    super(ENTITY_NAME, MAX_DISTANCE);
+    super(ENTITY_NAME, MAX_DISTANCE, 3);
   }
 
   /*

@@ -5,50 +5,11 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
-}
-
-
-configurations {
-    provided
-    compile.extendsFrom provided
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 dependencies {
-    provided project(':cineast')
-	compileOnly project(':cineast')
-	//add additional dependencies here
-}
-
-compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:all"
-}
-
-jar {
-    from {
-        (configurations.runtime - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) }
-    }
-
-    archiveName = 'plugins.jar' //contains only the plugins from this project
-}
-
-task standalone(type: Jar, dependsOn: "jar") {
-    manifest {
-        attributes 'Main-Class': 'org.vitrivr.cineast.api.API'
-    }
-
-    from sourceSets.main.output
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    archiveName = 'standalone.jar' //contains cineast and the plugins
-}
-
-task run(type: JavaExec) {
-  classpath sourceSets.main.runtimeClasspath
-  main = "org.vitrivr.cineast.api.API"
-  standardInput = System.in
-  if (project.hasProperty("appArgs")) {
-    args Eval.me(appArgs)
-  }
+    implementation group: 'org.vitrivr', name: 'cineast-core', version: '3.0.3-SNAPSHOT'
 }

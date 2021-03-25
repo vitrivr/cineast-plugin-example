@@ -20,3 +20,7 @@ bin
 framecache_*
 cineast/
 gradle/dists/
+
+.DS_Store
+
+.idea

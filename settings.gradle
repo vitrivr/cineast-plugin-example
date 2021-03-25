@@ -1,3 +1,1 @@
-rootProject.name = 'engine'
-include ':cineast'
-project(':cineast').projectDir = new File(settingsDir, './cineast')
+rootProject.name = 'plugin'

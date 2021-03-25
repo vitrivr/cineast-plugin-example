@@ -1,22 +1,27 @@
 package org.vitrivr.cineast.example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.vitrivr.cineast.core.config.Config;
 import org.vitrivr.cineast.core.config.ReadableQueryConfig;
 import org.vitrivr.cineast.core.data.CorrespondenceFunction;
 import org.vitrivr.cineast.core.data.FloatVector;
 import org.vitrivr.cineast.core.data.ReadableFloatVector;
 import org.vitrivr.cineast.core.data.distance.DistanceElement;
 import org.vitrivr.cineast.core.data.distance.SegmentDistanceElement;
+import org.vitrivr.cineast.core.data.providers.primitive.PrimitiveTypeProvider;
+import org.vitrivr.cineast.core.data.providers.primitive.StringTypeProvider;
 import org.vitrivr.cineast.core.data.score.ScoreElement;
 import org.vitrivr.cineast.core.data.segments.SegmentContainer;
 import org.vitrivr.cineast.core.db.DBSelector;
 import org.vitrivr.cineast.core.db.DBSelectorSupplier;
+import org.vitrivr.cineast.core.db.setup.EntityCreator;
 import org.vitrivr.cineast.core.features.retriever.Retriever;
-import org.vitrivr.cineast.core.setup.EntityCreator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static org.vitrivr.cineast.core.util.CineastConstants.FEATURE_COLUMN_QUALIFIER;
+import static org.vitrivr.cineast.core.util.CineastConstants.GENERIC_ID_COLUMN_QUALIFIER;
 
 public class MinimalExampleRetriever implements Retriever {
 
@@ -56,6 +61,11 @@ public class MinimalExampleRetriever implements Retriever {
     }
   }
 
+  @Override
+  public List<String> getTableNames() {
+    return Collections.singletonList(ENTITY_NAME);
+  }
+
   /*
    * This method is used to initialise the retriever with a connection to the storage layer. It is
    * called at the beginning of every query.
@@ -78,9 +88,9 @@ public class MinimalExampleRetriever implements Retriever {
     float[] queryFloatArray = ReadableFloatVector.toArray(queryVector);
 
     // We use the DBSelector to perform a nearest neighbour query on the storage layer.
-    List<SegmentDistanceElement> distances = this.selector.getNearestNeighbours(
+    List<SegmentDistanceElement> distances = this.selector.getNearestNeighboursGeneric(
         // The number of results requested is commonly identical to the value set in the configuration
-        Config.sharedConfig().getRetriever().getMaxResultsPerModule(),
+        qc.getResultsPerModule(),
         queryFloatArray, // We use the previously computed vector as a query-vector
         "feature", // By default, the property which holds the vectors is called 'feature'
         // Specify the type of results that we expect, that is either segments
@@ -103,10 +113,10 @@ public class MinimalExampleRetriever implements Retriever {
   }
 
   @Override
-  public List<ScoreElement> getSimilar(String shotId, ReadableQueryConfig qc) {
+  public List<ScoreElement> getSimilar(String segmentId, ReadableQueryConfig qc) {
     // To retrieve segments similar to an already known one, we first need to lookup the relevant
     // feature vector.
-    List<float[]> list = this.selector.getFeatureVectors("id", shotId, "feature");
+    List<PrimitiveTypeProvider> list = this.selector.getFeatureVectorsGeneric(GENERIC_ID_COLUMN_QUALIFIER, new StringTypeProvider(segmentId), FEATURE_COLUMN_QUALIFIER);
     
     // In case there is no such vector, the result set is empty.
     if (list.isEmpty()) {
@@ -114,8 +124,8 @@ public class MinimalExampleRetriever implements Retriever {
     }
 
     // After this lookup, the same query as above is performed.
-    List<SegmentDistanceElement> distances = this.selector.getNearestNeighbours(
-        Config.sharedConfig().getRetriever().getMaxResultsPerModule(),
+    List<SegmentDistanceElement> distances = this.selector.getNearestNeighboursGeneric(
+        qc.getResultsPerModule(),
         list.get(0), // We use the previously retrieved vector as a query-vector
         "feature",
         SegmentDistanceElement.class,
@@ -125,6 +135,11 @@ public class MinimalExampleRetriever implements Retriever {
         .orElse(CorrespondenceFunction.linear(1f));
     return DistanceElement.toScore(distances, function);
     
+  }
+
+  @Override
+  public List<ScoreElement> getSimilar(List<String> segmentIds, ReadableQueryConfig qc) {
+    return null;
   }
 
   /*
@@ -138,5 +153,4 @@ public class MinimalExampleRetriever implements Retriever {
       this.selector = null;
     }
   }
-
 }

@@ -1,5 +1,7 @@
 package org.vitrivr.cineast.example;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.vitrivr.cineast.core.data.FloatVector;
@@ -8,7 +10,7 @@ import org.vitrivr.cineast.core.db.PersistencyWriter;
 import org.vitrivr.cineast.core.db.PersistencyWriterSupplier;
 import org.vitrivr.cineast.core.db.PersistentTuple;
 import org.vitrivr.cineast.core.features.extractor.Extractor;
-import org.vitrivr.cineast.core.setup.EntityCreator;
+import org.vitrivr.cineast.core.db.setup.EntityCreator;
 
 public class MinimalExampleExtractor implements Extractor {
 
@@ -49,12 +51,17 @@ public class MinimalExampleExtractor implements Extractor {
     }
   }
 
+  @Override
+  public List<String> getTableNames() {
+    return Collections.singletonList(ENTITY_NAME);
+  }
+
   /*
    * This method is used to initialise the extractor with a connection to the storage layer. It is
    * called at the beginning of every new extraction.
    */
   @Override
-  public void init(PersistencyWriterSupplier pwriterSupply) {
+  public void init(PersistencyWriterSupplier pwriterSupply, int i) {
     this.pwriter = pwriterSupply.get();
     this.pwriter.open(ENTITY_NAME);
   }
